@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+
 Parameters:
   VpcCIDR:
     Type: String
@@ -41,6 +41,50 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnet
+
+EC2Instance1:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-05c13eab67c5d8861"  
+      InstanceType: "t2.micro"
+      KeyName: "EC2Instance1"  
+      SecurityGroupIds:
+        - 'sg-02459b5028487c77a'  # Specify the security group ID
+      SubnetId: 'subnet-02e663e353d67d102'  # public subnet id
+
+  EC2Instance2:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-05c13eab67c5d8861"
+      InstanceType: "t2.micro"
+      KeyName: "EC2Instance2"
+      SecurityGroupIds:
+        - 'sg-02459b5028487c77a'  # Specify the security group ID
+      SubnetId: 'subnet-0b8a35c402bd737dc'  # Private subnet ID
+  
+BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Security group for the Bastion Host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  BastionInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: "BastionInstance"
+      ImageId: "ami-05c13eab67c5d8861"  # Replace with a valid AMI ID
+      SubnetId: !Ref PublicSubnet1
+      SecurityGroupIds:
+        - !GetAtt BastionSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: BastionInstance
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway

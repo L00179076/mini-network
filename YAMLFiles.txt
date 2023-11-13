@@ -1,0 +1,1 @@
+Contains resources created on aws using YAML templatefor mini-network project
